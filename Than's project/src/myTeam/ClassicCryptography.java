@@ -143,7 +143,6 @@ public class ClassicCryptography extends JFrame {
 	//
 	///Bảng chữ cái tiếng Anh
 	static String alphabet = "abcdefghijklmnopqrstuvwxyz";
-	private JTextField textKey_2;
 	///Key do người dùng nhập vào
 	
 	///Hàm kiểm tra key nhập vào cho Monoalphabetic
@@ -158,7 +157,7 @@ public class ClassicCryptography extends JFrame {
 	}
 	
 	///Hàm dùng để mã hóa
-	//Hàm để tìm ký tự của c trong chuỗi alphabet
+	//Hàm để tìm ký tự trong chuỗi alphabet
 	static public int posAlphabet(char c) {
 		//dựa theo thứ tự của bảng mã ascii và bảng chữ cái tiếng Anh
 		//Lấy c - 'a'. Được vị trí của nó trong chuỗi alphabet
@@ -243,162 +242,126 @@ public class ClassicCryptography extends JFrame {
 	/**
 	 * BẮT ĐẦU thuật toán playfair
 	 */
-	 //Hàm chuyển chuỗi thành chữ thường
-	  static void toLowerCase(char plain[], int ps)
-	  {
-	    int i;
-	    for (i = 0; i < ps; i++) {
-	      if (plain[i] > 64 && plain[i] < 91)
-	        plain[i] += 32;
-	    }
-	  }
+	//1. Cặp chữ giống nhau được tách ra bởi một ký tự bổ sung (x)
+	//2. Hai chữ cái THUỘC một hàng = chữ cái bên phải (có nối vòng)
+	//3. Hai chữ cái THUỘC một cột = chữ cái bên dưới (có nối vòng):
+	//4. Mỗi chữ cái trong cặp → chữ cái nằm trong hàng riêng của nó 
+	//và cột của chữ cái còn lại: hs → BP; ea → IM (JM)
+	static String key = "monarchy";
+	
 
-	  //Hàm xóa tất cả khoảng trắng trong chuỗi
-	  static int removeSpaces(char[] plain, int ps)
-	  {
-	    int i, count = 0;
-	    for (i = 0; i < ps; i++)
-	      if (plain[i] != '\u0000')
-	        plain[count++] = plain[i];
+	
+	//Tạo một ma trận khóa
+	static String CreateMatrixkey(String key)
+	{
+		String Matrixkey =""; 
+		int flag[] = new int[26]; 
+		//khởi tạo giá trị ban đầu
+		for(int k=0;k< 26; k++) 
+			flag[k] = 0;
+		//
+		for(int i = 0; i < key.length(); i++)
+		{
+			int pos =  posAlphabet(key.charAt(i));
+			//Nếu flag tại vị trí pos = 0
+			//Thì cho ký tự vào ma trận khóa Matrixkey
+			if(flag[pos] == 0) {
+				Matrixkey += key.charAt(i); 
+				flag[pos] = 1; 
+			}
+		}
+		//kiểm tra i và j
+		//Nếu một trong 2 bặt cờ thì bật cờ cả hai
+		if(flag[posAlphabet('i')] == 1 || flag[posAlphabet('j')] == 1) 
+			flag[posAlphabet('i') ] = flag[posAlphabet('j')] = 1;
+		//Nếu cả hai đều không bật thì bật cờ của j
+		else flag[posAlphabet('j')] = 1; 
+		
+		//Duyệt kiểm tra nếu cờ của ký tự nào không bật 
+		//thì thêm vào ma trận khóa Matrixkey
+		for(int i=0; i < 26; i++) 
+			if(flag[i] == 0) 
+				Matrixkey += alphabet.charAt(i);
+		return Matrixkey;
+	}
+	
+	//Cặp chữ giống nhau được tách ra bởi một ký tự bổ sung (x), 
+	//và chuỗi lẻ thì thêm một ký tự bổ sung (x)
+	static String split(String input) {
+		String plaintext = ""; 
+		int len = input.length(); 
+		int i = 0; 
+		while(i < len - 1) { 
+			if(input.charAt(i) == input.charAt(i + 1)) { 
+				plaintext += input.charAt(i); 
+				plaintext += 'x'; 
+				i += 1; 
+			} 
+			else { 
+				plaintext += input.charAt(i); 
+				i +=1;
+			}
+		}
+		plaintext += input.charAt(input.length()-1);
+				if(plaintext.length() % 2 != 0 )
+					plaintext += 'x'; 
+				return plaintext;
+	}
+	
+	//
+	int CreateIndex(String matrixKey) {
+		int index[] = new int[26];
+		for(int i=0; i < 25; i++) {
+			int pos = posAlphabet(matrixKey.charAt(i));
+			index [pos] = i; 
+		} 
+		index [posAlphabet('j')] = index [posAlphabet('i')]; 
+		return index[26];
+	}
+	
+	 //	
+	 static String PlayFairEncryption(String input, String key) {
+		String plaintext = split(input);
+//		cout<<"\nplaintext after Split: " << plaintext<<" "<<plaintext.length();
+		String matrixKey = CreateMatrixkey(key);
 
-	    return count;
-	  }
+		int index[] = new int[26];
+		for(int i=0; i < 25; i++) {
+			int pos = posAlphabet(matrixKey.charAt(i));
+			index [pos] = i; 
+		} 
+		index [posAlphabet('j')] = index [posAlphabet('i')]; 
 
-	  //Hàm tạo hình vuông key 5x5
-	  static void generateKeyTable(char key[], int ks, char keyT[][])
-	  {
-	    int i, j, k, flag = 0;
-	    
-	    // một bản đồ băm 26 ký tự
-	    // để lưu trữ số lượng bảng chữ cái
-	    int dicty[] = new int[26];
-	    for (i = 0; i < ks; i++) {
-	      if (key[i] != 'j')
-	        dicty[key[i] - 97] = 2;
-	    }
-
-	    dicty['j' - 97] = 1;
-
-	    i = 0;
-	    j = 0;
-
-	    for (k = 0; k < ks; k++) {
-	      if (dicty[key[k] - 97] == 2) {
-	        dicty[key[k] - 97] -= 1;
-	        keyT[i][j] = key[k];
-	        j++;
-	        if (j == 5) {
-	          i++;
-	          j = 0;
-	        }
-	      }
-	    }
-
-	    for (k = 0; k < 26; k++) {
-	      if (dicty[k] == 0) {
-	        keyT[i][j] = (char)(k + 97);
-	        j++;
-	        if (j == 5) {
-	          i++;
-	          j = 0;
-	        }
-	      }
-	    }
-	  }
-	  //Hàm tìm kiếm ký tự của chữ ghép
-	 // trong ô khóa và trả về vị trí của chúng
-	  static void search(char keyT[][], char a, char b, int arr[])
-	  {
-	    int i, j;
-
-	    if (a == 'j')
-	      a = 'i';
-	    else if (b == 'j')
-	      b = 'i';
-
-	    for (i = 0; i < 5; i++) {
-
-	      for (j = 0; j < 5; j++) {
-
-	        if (keyT[i][j] == a) {
-	          arr[0] = i;
-	          arr[1] = j;
-	        }
-	        else if (keyT[i][j] == b) {
-	          arr[2] = i;
-	          arr[3] = j;
-	        }
-	      }
-	    }
-	  }
-
-	//Hàm tìm mô đun với 5
-	  static int mod5(int a) { return (a % 5); }
-
-	//Hàm làm cho văn bản thuần có độ dài chẵn
-	  static int prepare(char str[], int ptrs)
-	  {
-	    if (ptrs % 2 != 0) {
-	      str[ptrs++] = 'z';
-	      str[ptrs] = '\0';
-	    }
-	    return ptrs;
-	  }
-
-	//Hàm thực hiện mã hóa
-	  static void encrypt(char str[], char keyT[][], int ps)
-	  {
-	    int i;
-	    int[] a =new int[4];
-
-	    for (i = 0; i < ps; i += 2) {
-
-	      search(keyT, str[i], str[i + 1], a);
-
-	      if (a[0] == a[2]) {
-	        str[i] = keyT[a[0]][mod5(a[1] + 1)];
-	        str[i + 1] = keyT[a[0]][mod5(a[3] + 1)];
-	      }
-	      else if (a[1] == a[3]) {
-	        str[i] = keyT[mod5(a[0] + 1)][a[1]];
-	        str[i + 1] = keyT[mod5(a[2] + 1)][a[1]];
-	      }
-	      else {
-	        str[i] = keyT[a[0]][a[3]];
-	        str[i + 1] = keyT[a[2]][a[1]];
-	      }
-	    }
-	  }
-
-	//Hàm mã hóa bằng Playfair Cipher
-	  static void encryptByPlayfairCipher(char str[], char key[])
-	  {
-	    int ps; 
-	    int ks;
-	    char[][] keyT = new char[5][5];
-
-	    // Key
-	    ks = key.length;
-	    ks = removeSpaces(key, ks);
-	    toLowerCase(key, ks);
-
-	    // Plaintext
-	    ps = str.length;
-	    toLowerCase(str, ps);
-	    ps = removeSpaces(str, ps);
-
-	    ps = prepare(str, ps);
-
-	    generateKeyTable(key, ks, keyT);
-
-	    encrypt(str, keyT, ps);
-	  }
-
-	  static void strcpy(char[] arr, String s) {
-	    for(int i = 0;i < s.length();i++){
-	      arr[i] = s.charAt(i);
-	    }
-	  }
+		String ciphertext = "";
+		for(int i = 0; i <= input.length(); i += 2) {
+			int p1 = index[posAlphabet(plaintext.charAt(i))];
+			int p2 = index[posAlphabet(plaintext.charAt(i + 1))];
+			int row1 = p1/5, col1 = p1 % 5;
+			int row2 = p2/5, col2 = p2 % 5;
+			int c1, c2; 
+			if (row1 == row2) { 
+				col1 = (col1 + 1) % 5; 
+				col2 = (col2 + 1) % 5; 
+				c1 = row1*5+ col1; 
+				c2= row2 * 5 + col2; 
+			}
+			else if (col1 == col2) {
+				row1 = (row1 + 1)%5;
+				row2 = (row2 + 1)%5;
+				c1 = row1 * 5 + col1;
+				c2 = row2 * 5 + col2;
+				
+			}
+			else {
+				c1 = row1 * 5 + col2;
+				c2 = row2 * 5 + col1;
+			}
+			ciphertext += matrixKey.charAt(c1); 
+			ciphertext += matrixKey.charAt(c2); 	
+			}
+		return ciphertext;
+	}
+	
 	/**
 	 * KẾT THÚC thuật toán playfair
 	 */
@@ -424,7 +387,6 @@ public class ClassicCryptography extends JFrame {
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setBounds(0, 0, 786, 463);
 		contentPane.add(tabbedPane);
-		
 		
 		/**
 		 * Tạo và đặt thuộc tính Tab Caesar cipher
@@ -678,62 +640,73 @@ public class ClassicCryptography extends JFrame {
 		
 		
 		/**
-		 * 
+		 * Tạo và đặt thuộc tính cho Tab Playfair cipher
 		 */
 		JPanel panelPlayfair = new JPanel();
 		tabbedPane.addTab("Playfair cipher", null, panelPlayfair, null);
 		panelPlayfair.setLayout(null);
 		
+		//Tạo pane bên trái cho tab playfair
 		JPanel playfairPanelLeft = new JPanel();
 		playfairPanelLeft.setLayout(null);
 		playfairPanelLeft.setBounds(10, 11, 481, 416);
 		panelPlayfair.add(playfairPanelLeft);
 		
+		//Tạo thanh trượt cho ô nhập văn bản
 		JScrollPane scrollPaneInput_2 = new JScrollPane();
 		scrollPaneInput_2.setBounds(10, 10, 461, 183);
 		playfairPanelLeft.add(scrollPaneInput_2);
 		
+		//Tạo ô nhập văn bản đầu vào
 		JTextArea txtpnInput_2 = new JTextArea();
 		txtpnInput_2.setLineWrap(true);
 		txtpnInput_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		scrollPaneInput_2.setViewportView(txtpnInput_2);
 		
+		//Tạo thanh trượt cho ô xuất văn bản
 		JScrollPane scrollPaneResult_1_1 = new JScrollPane();
 		scrollPaneResult_1_1.setBounds(10, 223, 461, 183);
 		playfairPanelLeft.add(scrollPaneResult_1_1);
 		
+		//Tạo ô xuất văn bản đầu ra
 		JTextArea txtpnResult_2 = new JTextArea();
 		txtpnResult_2.setLineWrap(true);
 		txtpnResult_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		txtpnResult_2.setEditable(false);
 		scrollPaneResult_1_1.setViewportView(txtpnResult_2);
 		
+		//Tạo pane bên phải cho tab playfair
 		JPanel playfairPanelRight = new JPanel();
 		playfairPanelRight.setLayout(null);
 		playfairPanelRight.setBounds(501, 11, 270, 416);
 		panelPlayfair.add(playfairPanelRight);
 		
+		//Tạo label cho ô nhập key
 		JLabel lblNewLabel_2 = new JLabel("Key");
 		lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblNewLabel_2.setBounds(10, 220, 27, 17);
 		playfairPanelRight.add(lblNewLabel_2);
 		
-		textKey_2 = new JTextField();
+		//Tạo ô nhập key
+		JTextField textKey_2 = new JTextField();
 		textKey_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		textKey_2.setColumns(10);
 		textKey_2.setBounds(47, 220, 213, 19);
 		playfairPanelRight.add(textKey_2);
 		
+		//Tạo nút mã hóa
 		JButton btnEncryption_2 = new JButton("Encryption");
 		btnEncryption_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnEncryption_2.setBounds(18, 316, 108, 21);
 		playfairPanelRight.add(btnEncryption_2);
 		
+		//Tạo nút giải mã
 		JButton btnDecryption_2 = new JButton("Decryption");
 		btnDecryption_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnDecryption_2.setBounds(144, 316, 108, 21);
 		playfairPanelRight.add(btnDecryption_2);
 		
+		//Tạo heading cho tab playfair
 		Label heading_2 = new Label("Playfair cipher");
 		heading_2.setFont(new Font("Dialog", Font.BOLD, 14));
 		heading_2.setAlignment(Label.CENTER);

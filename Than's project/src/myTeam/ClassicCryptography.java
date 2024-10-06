@@ -69,9 +69,29 @@ public class ClassicCryptography extends JFrame {
 		return (char)(c+32);
 	}
 	
+	 //Hàm viết lại chuỗi thành chuỗi chữ thường
+	  static void toLowerCase(char plain[], int ps)
+	  {
+	    for (int i = 0; i < ps; i++) {
+	      if (plain[i] > 64 && plain[i] < 91)
+	        plain[i] += 32;
+	    }
+	  }
+	
+	//Hàm xóa tất cả khoảng trắng trong chuỗi
+	  static int removeSpaces(char[] plain, int ps)
+	  {
+	    int count = 0;
+	    for (int i = 0; i < ps; i++)
+	      if (plain[i] != '\u0000')
+	        plain[count++] = plain[i];
+
+	    return count;
+	  }
+
+	
 	///Tạo hàm kiểm tra văn bản cần mã hóa nhập vào hợp lệ hay không
 	private static Boolean checkText(String text) {
-		
 		for (int i = 0; i < text.length(); i++) {
 				if (text.charAt(i) == ' ')
 					continue;
@@ -153,7 +173,7 @@ public class ClassicCryptography extends JFrame {
 				if(key.charAt(i) == key.charAt(j))
 					return false;
 		}
-		return true;
+		return key != "";
 	}
 	
 	///Hàm dùng để mã hóa
@@ -166,7 +186,6 @@ public class ClassicCryptography extends JFrame {
 	}
 	
 	//Hàm mã hóa
-	//M dilovfheakgtbyzsmwnurxpqcj
 	static String monoalphabeticEncyption(String text, String key) {
 		//Tạo cipher text rỗng
 		String cipherText ="";
@@ -247,9 +266,17 @@ public class ClassicCryptography extends JFrame {
 	//3. Hai chữ cái THUỘC một cột = chữ cái bên dưới (có nối vòng):
 	//4. Mỗi chữ cái trong cặp → chữ cái nằm trong hàng riêng của nó 
 	//và cột của chữ cái còn lại: hs → BP; ea → IM (JM)
-	static String key = "monarchy";
-	
 
+	//Hàm kiểm tra key nhập vào có hợp lệ hay không
+	private static Boolean checkKeyPlayfair(String key) {
+		//Duyệt từng ký tự của key
+		for (int i = 0; i < key.length(); i++) {
+			//Nếu có ký tự khác a-z
+				if(key.charAt(i) < 'a' || key.charAt(i) > 'z')
+					return false;
+		}
+		return key != "";
+	}
 	
 	//Tạo một ma trận khóa
 	static String CreateMatrixkey(String key)
@@ -361,7 +388,6 @@ public class ClassicCryptography extends JFrame {
 			}
 		return ciphertext;
 	}
-	
 	/**
 	 * KẾT THÚC thuật toán playfair
 	 */
@@ -696,6 +722,25 @@ public class ClassicCryptography extends JFrame {
 		
 		//Tạo nút mã hóa
 		JButton btnEncryption_2 = new JButton("Encryption");
+		btnEncryption_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {				
+				//Kiểm tra văn bản và key nhập vào có hợp lệ hay không
+				if(checkText(txtpnInput_2.getText()) && checkKeyPlayfair(textKey_2.getText())) {
+					//Nếu hợp lệ gọi hàm giải mã
+//					txtpnResult_2.setText(PlayFairEncryption(txtpnResult_2.getText(), textKey_2.getText()));
+				}
+				//Ngược lại không hiển thị tin nhắn thông báo
+				else JOptionPane.showMessageDialog(
+						contentPane, 
+	                    "Văn bản nhập vào chứa các ký tự từ a-Z. \n"
+	                    + "Không có số và ký tự đặc biệt trong văn bản. \n"
+	                    + "Key nhập vào gồm các ký tự từ a-Z.\n"
+	                    + "Không có số và ký tự đặc biệt trong key."
+	                    + "Vui lòng kiểm tra và nhập lại.", 
+	                    "Thông báo!", 
+	                    JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
 		btnEncryption_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnEncryption_2.setBounds(18, 316, 108, 21);
 		playfairPanelRight.add(btnEncryption_2);

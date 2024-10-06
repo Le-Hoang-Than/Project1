@@ -8,7 +8,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JButton;
-import javax.swing.JTextPane;
 import java.awt.Font;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -23,8 +22,7 @@ public class ClassicCryptography extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private JTextField textKey_1;
-	private JTextField txtAlphabet;
+
 
 
 	/**
@@ -44,49 +42,35 @@ public class ClassicCryptography extends JFrame {
 	}
 	
 	
+	
+	
 	/**
-	 * 
-	 *Đây là Thuật toán cho Caesar
+	 * BẮT ĐẦU Các hàm xử lý chuỗi
 	 */
-	///Hàm kiểm tra là Chữ Hoa hay không
-	private static Boolean isUpper(char c) {
+	//Hàm kiểm tra có là Ký tự viết Hoa hay không
+	private static boolean isUpper(char c) {
+		//Khi c nằm trong đoạn từ A đến Z thì trả về true
 		return c >= 'A' && c <= 'Z';
 	}
 	
-	///Hàm dùng để mã hóa và giải mã Caesar
-	private static String encryptCaesar(String text, int key)
-	{
-		String result = "";
-	    //Duyệt văn bản
-	    for (int i = 0; i < text.length(); i++) {
-	        // Mã hóa từng ký tự
-	        // Mã hóa ký tự in hoa
-	    	if(text.charAt(i) == ' ')
-	    		result += ' ';
-	    	else if (isUpper(text.charAt(i)))
-	    			 result += (char)((text.charAt(i) + key - 65) % 26 + 65);
-	    	 //Mã hóa ký tự thường
-	    	 else result +=  (char)((text.charAt(i) + key - 97 )% 26 + 97);
-	    }
-	    //Trả về chuỗi đã mã hóa/giải mã
-		return result;
+	//Hàm kiểm tra có là Ký tự viết thường hay không
+	private static boolean isLower(char c) {
+		//Khi c nằm trong đoạn từ a đến z thì trả về true
+		return c >= 'a' && c <= 'z';
 	}
 	
+	//Hàm viết lại ký tự thường thành Hoa
+	private static char toUpper(char c) {
+		return (char)(c-32);
+	}
 	
+	//Hàm viết lại ký tự Hoa thành thường
+	private static char toLower(char c) {
+		return (char)(c+32);
+	}
 	
-	
-	
-	///Hàm format text nhập vào (Xóa khoảng trắng thừa)
-	/**
-	 * 
-	 */
-	
-	///Tạo hàm kiểm tra văn bản nhập vào hợp lệ hay không
-	private static Boolean checkText(String text, String key) {
-		for (int i = 0; i < key.length(); i++) {
-	    	 if (key.charAt(i) < '0' ||  key.charAt(i) > '9')
-	    		 return false;
-		}
+	///Tạo hàm kiểm tra văn bản cần mã hóa nhập vào hợp lệ hay không
+	private static Boolean checkText(String text) {
 		
 		for (int i = 0; i < text.length(); i++) {
 				if (text.charAt(i) == ' ')
@@ -94,27 +78,165 @@ public class ClassicCryptography extends JFrame {
 				else if (text.charAt(i) < 'A' ||  text.charAt(i) > 'z')
 		    		 return false;
 		 }
-		return Integer.parseInt(key) > 25 || Integer.parseInt(key) < 0 ? false : true;
+		return true;
+	}
+	/**
+	 * KẾT THÚC Các hàm xử lý chuỗi
+	 */
+		
+	
+	
+	
+	
+	
+	/**
+	 * BẮT ĐẦU Thuật toán cho Caesar
+	 */
+	///Hàm dùng để mã hóa và giải mã Caesar
+	private static String encryptCaesar(String text, int key)
+	{
+		String cipherText = "";
+	    //Duyệt văn bản
+	    for (int i = 0; i < text.length(); i++) {
+	        // Mã hóa từng ký tự
+	        // Mã hóa ký tự in hoa
+	    	if(text.charAt(i) == ' ')
+	    		cipherText += ' ';
+	    	else if (isUpper(text.charAt(i)))
+	    		cipherText += (char)((text.charAt(i) + key - 65) % 26 + 65);
+	    	 //Mã hóa ký tự thường
+	    	 else cipherText +=  (char)((text.charAt(i) + key - 97 )% 26 + 97);
+	    }
+	    //Trả về chuỗi đã mã hóa/giải mã
+		return cipherText;
 	}
 	
-	//Nạp chồng hàm kiểm tra văn bản nhập vào
-//	private static Boolean checkText(String text, String key, String generateKey) {
-//		for (int i = 0; i < key.length(); i++) {
-//	    	 if (key.charAt(i) < '0' ||  key.charAt(i) > '9')
-//	    		 return false;
-//		}
-//		for (int i = 0; i < generateKey.length(); i++) {
-//	    	 if (generateKey.charAt(i) < '0' ||  generateKey.charAt(i) > '9')
-//	    		 return false;
-//		}
-//		for (int i = 0; i < text.length(); i++) {
-//		    	 if (text.charAt(i) < 'A' ||  text.charAt(i) > 'z')
-//		    		 return false;
-//		 }
-//		return Integer.parseInt(key) > 25 || Integer.parseInt(key) < 0 ? false : true;
-//	}
+	///Hàm kiểm tra key của Caesar nhập vào có hợp lệ hay không
+	private static Boolean checkKeyCaesar(String text) {
+		//Duyệt văn bản
+		for (int i = 0; i < text.length(); i++) {
+			//Nếu có kí tự khác số trả về false
+			if (text.charAt(i) < '0' ||  text.charAt(i) > '9')
+				return false;
+		}
+		//Giá trị của key thuộc miền giá trị từ 0 đến 25
+		//Nếu không nằm trong dãy giá trị đó trả về false
+		//Ngược lại là true
+		return Integer.parseInt(text) > 25 || Integer.parseInt(text) < 0 ? false : true;
+	}
 	
 
+	/**
+	 * KẾT THÚC Thuật toán cho Caesar
+	 */
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * BẮT ĐẦU thuật toán cho Monoalphabetic - bảng chữ đơn
+	 */
+	//
+	///Bảng chữ cái tiếng Anh
+	static String alphabet = "abcdefghijklmnopqrstuvwxyz";
+	private JTextField textKey_2;
+	///Key do người dùng nhập vào
+	
+//	static String keyMonoalphabetic = "";
+	
+	///Hàm kiểm tra key nhập vào cho Monoalphabetic
+	private static Boolean checkKeyMonoalphabetic(String key) {
+		if(key.length() < 26) return false;
+		for (int i = 0; i < key.length(); i++) {
+			for (int j = i+1; j < key.length(); j++)
+				if(key.charAt(i) == key.charAt(j))
+					return false;
+		}
+		return true;
+	}
+	
+	///Hàm dùng để mã hóa
+	//Hàm để tìm ký tự của c trong chuỗi alphabet
+	static public int posAlphabet(char c) {
+		//dựa theo thứ tự của bảng mã ascii và bảng chữ cái tiếng Anh
+		//Lấy c - 'a'. Được vị trí của nó trong chuỗi alphabet
+		//Ví dụ 'a' - 'a' = 0
+		return c - 'a';
+	}
+	
+	//Hàm mã hóa
+	//M dilovfheakgtbyzsmwnurxpqcj
+	static String monoalphabeticEncyption(String text, String key) {
+		//Tạo cipher text rỗng
+		String cipherText ="";
+		//duyệt văn bản
+		for (int i = 0; i < text.length(); i++)
+		{
+			//Nếu là khoảng trắng thì + khoảng trắng vào chuỗi cipherText
+			if (text.charAt(i) == ' ')
+			{
+				cipherText += " ";
+			}
+			else if (isUpper(text.charAt(i)))
+			{
+				cipherText += toUpper(key.charAt((posAlphabet(toLower(text.charAt(i))))));
+			}
+			else {
+				cipherText += key.charAt(posAlphabet(text.charAt(i)));
+			}
+		}
+		return cipherText;
+	}
+	
+	///Hàm dùng để gải mã
+	//Hàm tìm vị trí của ký tự trong bảng chữ cái key
+	static int posCipher(char c, String key) {
+		for(int i = 0; i < key.length(); i++) {
+			if(c == key.charAt(i))
+				return i;
+		}
+		return -1;
+	}
+	
+	//Hàm giải mã
+	//Bda Dye dilovfheakgtbyzsmwnurxpqcj
+	static String monoalphabeticDecyption(String text, String key){
+		//Tạo plain text rỗng
+		String plainText = "";
+		//duyệt văn bản
+		for (int i = 0; i < text.length(); i++)
+		{
+			if (text.charAt(i) == ' ')
+			{
+				plainText += " ";
+			}
+			else if(isUpper(text.charAt(i))) {
+				plainText += toUpper(alphabet.charAt(posCipher(toLower(text.charAt(i)), key)));
+			}
+			else {
+				plainText += alphabet.charAt(posCipher(text.charAt(i), key));
+			}
+		}
+		return plainText;
+	}
+	/**
+	 * KẾT THÚC thuật toán cho Monoalphabetic - bảng chữ đơn
+	 */
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	/**
 	 * Tạo frame.
@@ -201,7 +323,7 @@ public class ClassicCryptography extends JFrame {
 		btnEncryption.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//Nếu nhập dữ liệu chính xác thì mã hóa Ngược lại mở cửa sổ tin nhắn
-				if(checkText(txtpnInput.getText(), textKey.getText())) {
+				if(checkText(txtpnInput.getText()) && checkKeyCaesar(textKey.getText())) {
 					txtpnResult.setText(encryptCaesar(txtpnInput.getText(), Integer.parseInt(textKey.getText())));
 				}
 				else JOptionPane.showMessageDialog(
@@ -229,7 +351,7 @@ public class ClassicCryptography extends JFrame {
 		btnDecryption.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//Nếu nhập dữ liệu chính xác thì giải mã Ngược lại mở cửa sổ tin nhắn
-				if(checkText(txtpnInput.getText(), textKey.getText())) {
+				if(checkText(txtpnInput.getText()) && checkKeyCaesar(textKey.getText())) {
 					//Áp dụng tính tuần hoàn cho nên Mã hóa(n) => Giải mã(26-n)
 					txtpnResult.setText(encryptCaesar(txtpnInput.getText(),26 - Integer.parseInt(textKey.getText())));
 				}
@@ -261,70 +383,119 @@ public class ClassicCryptography extends JFrame {
 		
 		
 		/**
-		 * 
+		 * Tạo và đặt thuộc tính Tab Monoalphabetic cipher
 		 */
 		JPanel panelMonoalphabetic = new JPanel();
 		tabbedPane.addTab("Monoalphabetic cipher", null, panelMonoalphabetic, null);
 		panelMonoalphabetic.setLayout(null);
 		
+		///Tạo pane bên trái
 		JPanel monoalphabeticPanelLeft = new JPanel();
 		monoalphabeticPanelLeft.setLayout(null);
 		monoalphabeticPanelLeft.setBounds(10, 10, 481, 416);
 		panelMonoalphabetic.add(monoalphabeticPanelLeft);
 		
+		//Tạo thanh trượt cho text đầu vào
 		JScrollPane scrollPaneInput_1 = new JScrollPane();
 		scrollPaneInput_1.setBounds(10, 10, 461, 183);
 		monoalphabeticPanelLeft.add(scrollPaneInput_1);
 		
+		//Tạo ô nhập text đầu vào
 		JTextArea txtpnInput_1 = new JTextArea();
 		txtpnInput_1.setLineWrap(true);
 		txtpnInput_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		scrollPaneInput_1.setViewportView(txtpnInput_1);
 		
+		//Tạo thanh trượt cho text đầu ra
 		JScrollPane scrollPaneResult_1 = new JScrollPane();
 		scrollPaneResult_1.setBounds(10, 223, 461, 183);
 		monoalphabeticPanelLeft.add(scrollPaneResult_1);
 		
+		//Tạo ô xuất văn bản đầu ra
 		JTextArea txtpnResult_1 = new JTextArea();
 		txtpnResult_1.setLineWrap(true);
 		txtpnResult_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		txtpnResult_1.setEditable(false);
 		scrollPaneResult_1.setViewportView(txtpnResult_1);
 		
+		///Tạo pane bên phải
 		JPanel monoalphabeticPanelRight = new JPanel();
 		monoalphabeticPanelRight.setLayout(null);
 		monoalphabeticPanelRight.setBounds(501, 10, 270, 416);
 		panelMonoalphabetic.add(monoalphabeticPanelRight);
 		
+		//Tạo label cho ô nhập key
 		JLabel lblNewLabel_1 = new JLabel("Key");
 		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblNewLabel_1.setBounds(10, 221, 27, 17);
 		monoalphabeticPanelRight.add(lblNewLabel_1);
 		
-		textKey_1 = new JTextField();
-		textKey_1.setEditable(false);
+		//Tạo ô nhập key
+		JTextField textKey_1 = new JTextField();
 		textKey_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		textKey_1.setColumns(10);
 		textKey_1.setBounds(47, 220, 213, 19);
 		monoalphabeticPanelRight.add(textKey_1);
 		
-		JButton btnEncryption_1 = new JButton("Encryption");
+		//Tạo và đặt thuộc tính cho nút mã hóa
+		JButton btnEncryption_1 = new JButton("Encryption");		
 		btnEncryption_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnEncryption_1.setBounds(18, 316, 108, 21);
 		monoalphabeticPanelRight.add(btnEncryption_1);
 		
+		//Xử lý sự kiện của nút
+		btnEncryption_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(checkText(txtpnInput_1.getText()) && checkKeyMonoalphabetic(textKey_1.getText())) {
+					
+					txtpnResult_1.setText(monoalphabeticEncyption(txtpnInput_1.getText(),textKey_1.getText()));
+					
+				}
+				else JOptionPane.showMessageDialog(
+						contentPane, 
+	                    "Văn bản nhập vào chứa các ký tự từ a-Z. \n"
+	                    + "Không có số và ký tự đặc biệt trong văn bản. \n"
+	                    + "Key nhập vào gồm 26 ký tự tiếng Anh và không trùng nhau. \n"
+	                    + "Vui lòng kiểm tra và nhập lại.", 
+	                    "Thông báo!", 
+	                    JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+		
+		//Tạo và đặt thuộc tính cho nút giải mã
 		JButton btnDecryption_1 = new JButton("Decryption");
 		btnDecryption_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnDecryption_1.setBounds(144, 316, 108, 21);
 		monoalphabeticPanelRight.add(btnDecryption_1);
 		
-		Label heading1 = new Label("Monoalphabetic cipher");
-		heading1.setFont(new Font("Dialog", Font.BOLD, 14));
-		heading1.setAlignment(Label.CENTER);
-		heading1.setBounds(10, 77, 250, 66);
-		monoalphabeticPanelRight.add(heading1);
+		//Xử lý sự kiện của nút
+		btnDecryption_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(checkText(txtpnInput_1.getText()) && checkKeyMonoalphabetic(textKey_1.getText())) {
+					
+					txtpnResult_1.setText(monoalphabeticDecyption(txtpnInput_1.getText(),textKey_1.getText()));
+					
+				}
+				else JOptionPane.showMessageDialog(
+						contentPane, 
+	                    "Văn bản nhập vào chứa các ký tự từ a-Z. \n"
+	                    + "Không có số và ký tự đặc biệt trong văn bản. \n"
+	                    + "Key nhập vào gồm 26 ký tự tiếng Anh và không trùng nhau. \n"
+	                    + "Vui lòng kiểm tra và nhập lại.", 
+	                    "Thông báo!", 
+	                    JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
 		
-		txtAlphabet = new JTextField();
+		//Tạo heading cho tab Monoalphabetic cipher
+		Label heading_1 = new Label("Monoalphabetic cipher");
+		heading_1.setFont(new Font("Dialog", Font.BOLD, 14));
+		heading_1.setAlignment(Label.CENTER);
+		heading_1.setBounds(10, 77, 250, 66);
+		monoalphabeticPanelRight.add(heading_1);
+		
+		//Tạo ô hiển thị bảng chữ cái tiếng anh
+		JTextField txtAlphabet = new JTextField();
 		txtAlphabet.setEditable(false);
 		txtAlphabet.setText("abcdefghijklmnopqrstuvwxyz");
 		txtAlphabet.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -339,6 +510,63 @@ public class ClassicCryptography extends JFrame {
 		 */
 		JPanel panelPlayfair = new JPanel();
 		tabbedPane.addTab("Playfair cipher", null, panelPlayfair, null);
+		panelPlayfair.setLayout(null);
+		
+		JPanel playfairPanelLeft = new JPanel();
+		playfairPanelLeft.setLayout(null);
+		playfairPanelLeft.setBounds(10, 11, 481, 416);
+		panelPlayfair.add(playfairPanelLeft);
+		
+		JScrollPane scrollPaneInput_2 = new JScrollPane();
+		scrollPaneInput_2.setBounds(10, 10, 461, 183);
+		playfairPanelLeft.add(scrollPaneInput_2);
+		
+		JTextArea txtpnInput_2 = new JTextArea();
+		txtpnInput_2.setLineWrap(true);
+		txtpnInput_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		scrollPaneInput_2.setViewportView(txtpnInput_2);
+		
+		JScrollPane scrollPaneResult_1_1 = new JScrollPane();
+		scrollPaneResult_1_1.setBounds(10, 223, 461, 183);
+		playfairPanelLeft.add(scrollPaneResult_1_1);
+		
+		JTextArea txtpnResult_2 = new JTextArea();
+		txtpnResult_2.setLineWrap(true);
+		txtpnResult_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		txtpnResult_2.setEditable(false);
+		scrollPaneResult_1_1.setViewportView(txtpnResult_2);
+		
+		JPanel playfairPanelRight = new JPanel();
+		playfairPanelRight.setLayout(null);
+		playfairPanelRight.setBounds(501, 11, 270, 416);
+		panelPlayfair.add(playfairPanelRight);
+		
+		JLabel lblNewLabel_2 = new JLabel("Key");
+		lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblNewLabel_2.setBounds(39, 220, 27, 17);
+		playfairPanelRight.add(lblNewLabel_2);
+		
+		textKey_2 = new JTextField();
+		textKey_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		textKey_2.setColumns(10);
+		textKey_2.setBounds(105, 220, 124, 19);
+		playfairPanelRight.add(textKey_2);
+		
+		JButton btnEncryption_2 = new JButton("Encryption");
+		btnEncryption_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		btnEncryption_2.setBounds(18, 316, 108, 21);
+		playfairPanelRight.add(btnEncryption_2);
+		
+		JButton btnDecryption_2 = new JButton("Decryption");
+		btnDecryption_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		btnDecryption_2.setBounds(144, 316, 108, 21);
+		playfairPanelRight.add(btnDecryption_2);
+		
+		Label heading_2 = new Label("Playfair cipher");
+		heading_2.setFont(new Font("Dialog", Font.BOLD, 14));
+		heading_2.setAlignment(Label.CENTER);
+		heading_2.setBounds(10, 77, 250, 66);
+		playfairPanelRight.add(heading_2);
 		
 		
 		

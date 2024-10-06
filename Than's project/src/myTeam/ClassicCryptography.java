@@ -146,8 +146,6 @@ public class ClassicCryptography extends JFrame {
 	private JTextField textKey_2;
 	///Key do người dùng nhập vào
 	
-//	static String keyMonoalphabetic = "";
-	
 	///Hàm kiểm tra key nhập vào cho Monoalphabetic
 	private static Boolean checkKeyMonoalphabetic(String key) {
 		if(key.length() < 26) return false;
@@ -446,11 +444,13 @@ public class ClassicCryptography extends JFrame {
 		//Xử lý sự kiện của nút
 		btnEncryption_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				//Kiểm tra văn bản và key nhập vào có hợp lệ hay không
 				if(checkText(txtpnInput_1.getText()) && checkKeyMonoalphabetic(textKey_1.getText())) {
-					
+					//Nếu hợp lệ gọi hàm mã hóa
 					txtpnResult_1.setText(monoalphabeticEncyption(txtpnInput_1.getText(),textKey_1.getText()));
 					
 				}
+				//Ngược lại không hiển thị tin nhắn thông báo
 				else JOptionPane.showMessageDialog(
 						contentPane, 
 	                    "Văn bản nhập vào chứa các ký tự từ a-Z. \n"
@@ -471,11 +471,13 @@ public class ClassicCryptography extends JFrame {
 		//Xử lý sự kiện của nút
 		btnDecryption_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				//Kiểm tra văn bản và key nhập vào có hợp lệ hay không
 				if(checkText(txtpnInput_1.getText()) && checkKeyMonoalphabetic(textKey_1.getText())) {
-					
+					//Nếu hợp lệ gọi hàm giải mã
 					txtpnResult_1.setText(monoalphabeticDecyption(txtpnInput_1.getText(),textKey_1.getText()));
 					
 				}
+				//Ngược lại không hiển thị tin nhắn thông báo
 				else JOptionPane.showMessageDialog(
 						contentPane, 
 	                    "Văn bản nhập vào chứa các ký tự từ a-Z. \n"
@@ -543,13 +545,13 @@ public class ClassicCryptography extends JFrame {
 		
 		JLabel lblNewLabel_2 = new JLabel("Key");
 		lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblNewLabel_2.setBounds(39, 220, 27, 17);
+		lblNewLabel_2.setBounds(10, 220, 27, 17);
 		playfairPanelRight.add(lblNewLabel_2);
 		
 		textKey_2 = new JTextField();
 		textKey_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		textKey_2.setColumns(10);
-		textKey_2.setBounds(105, 220, 124, 19);
+		textKey_2.setBounds(47, 220, 213, 19);
 		playfairPanelRight.add(textKey_2);
 		
 		JButton btnEncryption_2 = new JButton("Encryption");
